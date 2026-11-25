@@ -1,0 +1,106 @@
+/* ===================================================================
+   VARIEDADES CASERAS - ANIMACIONES Y TRANSICIONES PROFESIONALES
+   Fluidas, elegantes, de alto rendimiento (GPU) y respetando accesibilidad
+   =================================================================== */
+
+/* Animacion de entrada con IntersectionObserver */
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.fade-in-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Retardos escalonados progresivos y naturales */
+.delay-1 { transition-delay: 0.08s; }
+.delay-2 { transition-delay: 0.16s; }
+.delay-3 { transition-delay: 0.24s; }
+.delay-4 { transition-delay: 0.32s; }
+.delay-5 { transition-delay: 0.40s; }
+
+/* Entrada suave al cargar el Hero */
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-text-col,
+.editorial-cover-text {
+  animation: heroFadeIn 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.hero-visual-col,
+.editorial-cover-visual {
+  animation: heroFadeIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) 0.12s backwards;
+}
+
+/* Inclinacion sutil y fluida en computadoras */
+@media (min-width: 1025px) {
+  .tilt-target {
+    transform-style: preserve-3d;
+    transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+    will-change: transform;
+  }
+}
+
+/* Transicion para modal lightbox */
+.lightbox-modal {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+
+.lightbox-modal.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lightbox-content {
+  transform: scale(0.96);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lightbox-modal.open .lightbox-content {
+  transform: scale(1);
+}
+
+/* ================= ACCESIBILIDAD ESTRICTA (REDUCED MOTION) ================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .fade-in-up {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .hero-text-col,
+  .hero-visual-col {
+    animation: none !important;
+  }
+
+  .tilt-target {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .lightbox-content {
+    transform: none !important;
+  }
+}

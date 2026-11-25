@@ -1,0 +1,26 @@
+{
+  "hosting": [
+    {
+      "site": "paginas-b6e4d",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "README.md",
+        "imagenes/**"
+      ]
+    },
+    {
+      "site": "variedadescaseras",
+      "public": ".",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "README.md",
+        "imagenes/**"
+      ]
+    }
+  ]
+}
