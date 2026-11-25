@@ -14,6 +14,7 @@
 .fade-in-up.is-visible {
   opacity: 1;
   transform: translateY(0);
+  will-change: auto;
 }
 
 /* Retardos escalonados progresivos y naturales */
@@ -35,12 +36,10 @@
   }
 }
 
-.hero-text-col,
 .editorial-cover-text {
   animation: heroFadeIn 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
 
-.hero-visual-col,
 .editorial-cover-visual {
   animation: heroFadeIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) 0.12s backwards;
 }
@@ -50,6 +49,9 @@
   .tilt-target {
     transform-style: preserve-3d;
     transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+  }
+
+  .tilt-target:hover {
     will-change: transform;
   }
 }
@@ -88,16 +90,19 @@
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    will-change: auto !important;
   }
 
-  .hero-text-col,
-  .hero-visual-col {
+  .editorial-cover-text,
+  .editorial-cover-visual,
+  .legal-modal-card {
     animation: none !important;
   }
 
   .tilt-target {
     transform: none !important;
     transition: none !important;
+    will-change: auto !important;
   }
 
   .lightbox-content {

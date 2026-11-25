@@ -23,6 +23,8 @@ const PRODUCTS = [
     ],
     format: "Cocción: freír directo del freezer en aceite caliente hasta dorar (no aptas para horno).",
     image: "assets/fotos/producto-empanaditas.jpg?v=5",
+    imageWidth: 896,
+    imageHeight: 1200,
     imageAlt: "Bandejas de Empanaditas (Risoles) rebozadas listas para freír",
     imageCaption: "Empanaditas rebozadas en bandeja, listas para freír.",
     ctaLabel: "Pedir Empanaditas",
@@ -38,6 +40,8 @@ const PRODUCTS = [
     fillings: [],
     format: "Cocción: colocar directo del freezer en abundante agua hirviendo con sal hasta que suban a la superficie.",
     image: "assets/fotos/producto-noquis.jpg?v=5",
+    imageWidth: 1024,
+    imageHeight: 1024,
     imageAlt: "Bandeja de ñoquis caseros con estrías tradicionales sobre mesada",
     imageCaption: "Ñoquis artesanales con estrías marcadas a mano.",
     ctaLabel: "Pedir Ñoquis",
@@ -56,6 +60,8 @@ const PRODUCTS = [
     ],
     format: "Cocción: hervir directamente sin descongelar en agua salada y servir con manteca o cebolla dorada.",
     image: "assets/fotos/producto-vareniques.jpg?v=5",
+    imageWidth: 896,
+    imageHeight: 1200,
     imageAlt: "Bandejas de varenikes artesanales de ricota y papa sobre mesada",
     imageCaption: "Varenikes caseros cerrados con repulgue tradicional.",
     ctaLabel: "Pedir Varenikes",
@@ -71,6 +77,8 @@ const PRODUCTS = [
     fillings: [],
     format: "Cocción: dorar directo del freezer al horno fuerte, sartén o freidora con un hilo de aceite.",
     image: "assets/fotos/producto-milanesas-berenjena.jpg?v=4",
+    imageWidth: 896,
+    imageHeight: 1200,
     imageAlt: "Bandejas de milanesas de berenjena rebozadas sobre mesada",
     imageCaption: "Milanesas de berenjena rebozadas, listas para dorar.",
     ctaLabel: "Pedir Milanesas",
@@ -78,42 +86,54 @@ const PRODUCTS = [
   }
 ];
 
-// Galeria con fotografias reales del taller y productos
+// Galería con fotografías reales del taller y productos (reutiliza rutas para aprovechar caché del navegador)
 const GALLERY = [
   {
     title: "Empanaditas (Risoles) doradas",
     category: "Recién fritas",
-    image: "assets/fotos/galeria-empanaditas-doradas.jpg?v=3",
+    image: "assets/fotos/hero-empanaditas.jpg?v=3",
+    width: 1200,
+    height: 896,
     alt: "Empanaditas (Risoles) doradas y crujientes recién fritas"
   },
   {
     title: "Empanaditas en bandejas",
     category: "Listas para freír",
-    image: "assets/fotos/galeria-empanaditas-bandeja.jpg?v=5",
+    image: "assets/fotos/producto-empanaditas.jpg?v=5",
+    width: 896,
+    height: 1200,
     alt: "Bandejas de Empanaditas (Risoles) rebozadas listas para freír"
   },
   {
     title: "Ñoquis artesanales",
     category: "Con estrías a mano",
-    image: "assets/fotos/galeria-noquis-estrias.jpg?v=5",
+    image: "assets/fotos/producto-noquis.jpg?v=5",
+    width: 1024,
+    height: 1024,
     alt: "Bandeja de ñoquis caseros con estrías tradicionales"
   },
   {
     title: "Varenikes en bandejas",
     category: "Ricota y papa",
-    image: "assets/fotos/galeria-vareniques-frescos.jpg?v=5",
+    image: "assets/fotos/producto-vareniques.jpg?v=5",
+    width: 896,
+    height: 1200,
     alt: "Varenikes artesanales de ricota y papa sobre mesada"
   },
   {
     title: "Milanesas de berenjena",
     category: "Rebozado casero",
-    image: "assets/fotos/galeria-milanesas-berenjena.jpg?v=4",
+    image: "assets/fotos/producto-milanesas-berenjena.jpg?v=4",
+    width: 896,
+    height: 1200,
     alt: "Bandejas de milanesas de berenjena rebozadas listas para cocinar"
   },
   {
     title: "Bandejas selladas con fecha",
     category: "Rótulo y trazabilidad",
     image: "assets/fotos/galeria-pedidos-listos.jpg?v=5",
+    width: 1200,
+    height: 896,
     alt: "Bandejas congeladas selladas con rótulo de fecha de elaboración y vencimiento"
   }
 ];

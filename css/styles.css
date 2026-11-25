@@ -4,8 +4,6 @@
    Paleta: Blanco hueso (#F7F3EC), Arena (#EDE4D3), Marrón (#3B2A20), Terracota (#B5562F)
    =================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-
 :root {
   /* Paleta cromatica editorial gastronomica */
   --color-bg: #F7F3EC;
@@ -23,11 +21,12 @@
   --color-footer-bg: #3B2A20;
   --color-footer-text: #F7F3EC;
   
-  /* Acento terracota natural */
+  /* Acento terracota natural (con contraste WCAG AA verificado) */
   --color-terracotta: #B5562F;
   --color-terracotta-hover: #9C431F;
   --color-terracotta-soft: #F5E8DF;
-  --color-terracotta-text: #AC4B24;
+  --color-terracotta-text: #9E421E;
+  --color-error: #A63322;
 
   /* Canal WhatsApp */
   --color-whatsapp: #25D366;
@@ -76,10 +75,11 @@
   --color-footer-bg: #120D0A;
   --color-footer-text: #F7F3EC;
 
-  --color-terracotta: #D47047;
-  --color-terracotta-hover: #E3835B;
+  --color-terracotta: #B85831;
+  --color-terracotta-hover: #A44A26;
   --color-terracotta-soft: #38251C;
-  --color-terracotta-text: #E3835B;
+  --color-terracotta-text: #E88D67;
+  --color-error: #F28B7D;
 
   --color-whatsapp: #25D366;
   --color-whatsapp-hover: #1EBE5D;
@@ -117,7 +117,11 @@ body {
 
 ::selection {
   background: var(--color-terracotta-soft);
-  color: var(--color-terracotta);
+  color: var(--color-terracotta-text);
+}
+
+section[id] {
+  scroll-margin-top: var(--nav-height);
 }
 
 img {
@@ -197,7 +201,7 @@ h1, h2, h3, h4 {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: var(--color-terracotta);
+  color: var(--color-terracotta-text);
   margin-bottom: 12px;
 }
 
@@ -590,6 +594,18 @@ button:disabled {
   transform: rotate(12deg) scale(1.08);
 }
 
+.theme-toggle-btn .icon-sun {
+  display: none;
+}
+
+[data-theme="dark"] .theme-toggle-btn .icon-moon {
+  display: none;
+}
+
+[data-theme="dark"] .theme-toggle-btn .icon-sun {
+  display: block;
+}
+
 .mobile-menu-btn {
   display: none;
 }
@@ -629,25 +645,8 @@ button:disabled {
 }
 
 .mobile-nav-links a:hover {
-  color: var(--color-terracotta);
+  color: var(--color-terracotta-text);
   transform: translateX(4px);
-}
-
-.mobile-nav-theme-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 0;
-  margin: 16px 0;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.mobile-theme-label {
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text);
 }
 
 /* ================= 1. PORTADA EDITORIAL (HERO) ================= */
@@ -781,7 +780,7 @@ button:disabled {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: var(--color-terracotta);
+  color: var(--color-terracotta-text);
   display: block;
   margin-bottom: 12px;
 }
@@ -797,30 +796,6 @@ button:disabled {
   color: var(--color-text-muted);
   line-height: 1.65;
   margin-bottom: 24px;
-}
-
-.manifesto-modality-row {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding-top: 18px;
-  border-top: 1px solid var(--color-border);
-}
-
-.modality-badge {
-  font-size: 0.74rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-terracotta);
-  flex-shrink: 0;
-}
-
-.manifesto-modality-text {
-  font-size: 0.88rem !important;
-  color: var(--color-text-muted) !important;
-  line-height: 1.5 !important;
-  margin-bottom: 0 !important;
 }
 
 .manifesto-commitments-wrapper {
@@ -920,7 +895,7 @@ button:disabled {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--color-terracotta);
+  color: var(--color-terracotta-text);
   margin-bottom: 8px;
 }
 
@@ -961,7 +936,7 @@ button:disabled {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--color-terracotta);
+  color: var(--color-terracotta-text);
   margin-bottom: 12px;
   border-bottom: 1px solid var(--color-border);
   padding-bottom: 8px;
@@ -1059,7 +1034,7 @@ button:disabled {
   border-color: var(--color-terracotta);
 }
 
-.manifesto-item h4 {
+.manifesto-item h3 {
   font-size: 1.05rem;
   font-weight: 600;
   margin-bottom: 8px;
@@ -1212,12 +1187,6 @@ button:disabled {
   color: var(--color-text-muted);
   line-height: 1.65;
   margin-bottom: 28px;
-}
-
-.order-journey-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .order-journey-track {
@@ -1373,7 +1342,7 @@ button:disabled {
   position: relative;
   height: 230px;
   overflow: hidden;
-  background-color: var(--color-surface-soft);
+  background-color: var(--color-surface);
 }
 
 .delivery-pickup-media img {
@@ -1420,7 +1389,7 @@ button:disabled {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: var(--color-terracotta);
+  color: var(--color-terracotta-text);
 }
 
 .delivery-pickup-title {
@@ -1611,6 +1580,22 @@ button:disabled {
   min-height: 95px;
 }
 
+.form-input[aria-invalid="true"],
+.form-textarea[aria-invalid="true"],
+.form-select[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+.form-error {
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--color-error);
+  background-color: var(--color-terracotta-soft);
+  border-left: 3px solid var(--color-error);
+  padding: 10px 12px;
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+}
+
 /* ================= 8. FOOTER ================= */
 .site-footer {
   background-color: var(--color-footer-bg);
@@ -1627,7 +1612,7 @@ button:disabled {
   border-bottom: 1px solid rgba(247, 243, 236, 0.14);
 }
 
-.footer-brand h4 {
+.footer-brand h2 {
   color: var(--color-footer-text);
   font-size: 1.45rem;
   font-weight: 700;
@@ -1641,14 +1626,7 @@ button:disabled {
   max-width: 390px;
 }
 
-.footer-origin-tagline {
-  margin-top: 16px;
-  font-size: 0.88rem !important;
-  font-weight: 600;
-  color: var(--color-footer-text) !important;
-}
-
-.footer-col h5 {
+.footer-col h3 {
   color: var(--color-footer-text);
   font-family: var(--font-sans);
   font-size: 0.78rem;
@@ -1665,8 +1643,7 @@ button:disabled {
 }
 
 .footer-links a,
-.footer-static-item,
-.footer-cookie-config-btn {
+.footer-static-item {
   font-size: 0.88rem;
   color: #D5C8BA;
   line-height: 1.45;
@@ -1679,30 +1656,6 @@ button:disabled {
 }
 
 .footer-links a:hover {
-  color: var(--color-footer-text);
-  transform: translateX(2px);
-}
-
-.footer-cookie-config-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: transparent;
-  border: none;
-  padding: 0;
-  width: fit-content;
-  font-family: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-
-.footer-cookie-config-btn svg {
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
-}
-
-.footer-cookie-config-btn:hover {
   color: var(--color-footer-text);
   transform: translateX(2px);
 }
@@ -1720,11 +1673,6 @@ button:disabled {
   .editorial-cover-grid {
     grid-template-columns: 1fr;
     gap: 40px;
-  }
-
-  .manifesto-inner {
-    grid-template-columns: 1fr;
-    gap: 30px;
   }
 
   .editorial-spread,
@@ -1839,6 +1787,28 @@ button:disabled {
 }
 
 /* ================= REFINAMIENTOS DE MODO NOCTURNO ================= */
+[data-theme="dark"] .site-header::before {
+  background: linear-gradient(
+    to bottom,
+    rgba(26, 20, 16, 0.78) 0%,
+    rgba(26, 20, 16, 0.45) 56%,
+    rgba(26, 20, 16, 0) 100%
+  );
+}
+
+[data-theme="dark"] .site-header.is-scrolled .brand-title {
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.65);
+}
+
+[data-theme="dark"] .desktop-nav {
+  border-color: rgba(61, 49, 40, 0.85);
+}
+
+[data-theme="dark"] .site-header.is-scrolled .desktop-nav {
+  background-color: rgba(46, 37, 30, 0.92);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
 [data-theme="dark"] .delivery-pickup-badge {
   background-color: rgba(18, 16, 14, 0.92);
   color: #F5EFEB;
@@ -1853,7 +1823,7 @@ button:disabled {
 }
 
 [data-theme="dark"] .footer-bottom {
-  color: #6E685F;
+  color: #A89E93;
 }
 
 /* ================= MODAL AVISOS LEGALES ================= */
@@ -1913,7 +1883,7 @@ button:disabled {
   background-color: var(--color-surface);
 }
 
-.legal-modal-header h3 {
+.legal-modal-header h2 {
   font-family: var(--font-serif);
   font-size: 1.22rem;
   font-weight: 600;
@@ -1946,7 +1916,7 @@ button:disabled {
   color: var(--color-text);
 }
 
-.legal-modal-body h4 {
+.legal-modal-body h3 {
   font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 700;
@@ -1957,7 +1927,7 @@ button:disabled {
   letter-spacing: 0.06em;
 }
 
-.legal-modal-body h4:first-child {
+.legal-modal-body h3:first-child {
   margin-top: 0;
 }
 
@@ -1972,89 +1942,4 @@ button:disabled {
   background-color: var(--color-surface);
   display: flex;
   justify-content: flex-end;
-}
-
-/* ================= BANNER DE COOKIES (COOKIS) ================= */
-.cookie-banner {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 990;
-  background-color: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  box-shadow: 0 -4px 20px rgba(59, 42, 32, 0.1);
-  padding: 16px 0;
-  transform: translateY(100%);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease;
-}
-
-.cookie-banner.is-visible {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.cookie-banner-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.cookie-text {
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: var(--color-text);
-  max-width: 780px;
-}
-
-.cookie-text strong {
-  color: var(--color-text);
-  font-weight: 600;
-}
-
-.cookie-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.cookie-btn {
-  padding: 8px 20px;
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-.cookie-legal-trigger {
-  background: transparent;
-  border: none;
-  color: var(--color-terracotta-text);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 6px 10px;
-  white-space: nowrap;
-  font-family: inherit;
-  transition: color var(--transition-fast);
-}
-
-.cookie-legal-trigger:hover {
-  color: var(--color-terracotta-hover);
-}
-
-@media (max-width: 768px) {
-  .cookie-banner-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-  .cookie-actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
 }

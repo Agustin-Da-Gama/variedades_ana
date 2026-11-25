@@ -2,10 +2,12 @@
  * VARIEDADES CASERAS - LOGICA PRINCIPAL MEJORADA
  * ==============================================
  * Modalidad de pedidos por mensaje, renderizado de productos congelados,
- * inclinacion 3D fluida y sutil, scroll spy, cabecera dinamica, lightbox y contacto directo.
+ * inclinacion 3D fluida y sutil, scroll spy, cabecera dinamica, tema claro/oscuro,
+ * lightbox accesible y contacto directo.
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  initThemeToggle();
   initHeaderScroll();
   initScrollSpy();
   initSmoothLinks();
@@ -19,10 +21,123 @@ document.addEventListener("DOMContentLoaded", () => {
   initLightbox();
   initContactForm();
   initLegalModal();
-  initCookieBanner();
 });
 
-/* ================= 1. CABECERA DINAMICA AL SCROLL ================= */
+/* ================= UTILIDADES DE ACCESIBILIDAD ================= */
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])'
+].join(', ');
+
+function createModalController(modalEl, { openClass = "open", onAfterClose } = {}) {
+  let lastFocusedEl = null;
+
+  const isOpen = () => modalEl.classList.contains(openClass);
+
+  const getFocusable = () =>
+    Array.from(modalEl.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
+      (el) => el.offsetParent !== null
+    );
+
+  const handleKeyDown = (e) => {
+    if (!isOpen()) return;
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      close();
+      return;
+    }
+
+    if (e.key === "Tab") {
+      const focusable = getFocusable();
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  };
+
+  const open = (initialFocusEl) => {
+    lastFocusedEl = document.activeElement;
+    modalEl.classList.add(openClass);
+    modalEl.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+
+    const target = initialFocusEl || getFocusable()[0];
+    if (target) {
+      requestAnimationFrame(() => target.focus());
+    }
+  };
+
+  const close = () => {
+    if (!isOpen()) return;
+    modalEl.classList.remove(openClass);
+    modalEl.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    document.removeEventListener("keydown", handleKeyDown);
+
+    if (typeof onAfterClose === "function") {
+      onAfterClose();
+    }
+
+    if (lastFocusedEl && typeof lastFocusedEl.focus === "function") {
+      lastFocusedEl.focus();
+    }
+    lastFocusedEl = null;
+  };
+
+  return { open, close, isOpen };
+}
+
+/* ================= 0. MODO CLARO / NOCTURNO ================= */
+function initThemeToggle() {
+  const btn = document.getElementById("themeToggleBtn");
+  const meta = document.getElementById("themeColorMeta");
+  if (!btn) return;
+
+  const syncState = () => {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    btn.setAttribute("aria-pressed", isDark ? "true" : "false");
+    btn.setAttribute("aria-label", isDark ? "Cambiar a modo claro" : "Cambiar a modo nocturno");
+    if (meta) {
+      meta.setAttribute("content", isDark ? "#1A1410" : "#F7F3EC");
+    }
+  };
+
+  syncState();
+
+  btn.addEventListener("click", () => {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    const nextTheme = isDark ? "light" : "dark";
+
+    if (nextTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+
+    try {
+      localStorage.setItem("variedades_caseras_theme", nextTheme);
+    } catch (e) {}
+
+    syncState();
+  });
+}
+
+/* ================= 1. CABECERA DINÁMICA AL SCROLL ================= */
 function initHeaderScroll() {
   const header = document.querySelector(".site-header");
   if (!header) return;
@@ -48,50 +163,63 @@ function initHeaderScroll() {
   updateHeader();
 }
 
-/* ================= 2. SCROLL SPY PARA NAVEGACION ACTIVA ================= */
+/* ================= 2. SCROLL SPY PARA NAVEGACIÓN ACTIVA ================= */
 function initScrollSpy() {
-  const sections = document.querySelectorAll("section[id]");
-  const navLinks = document.querySelectorAll(".desktop-nav .nav-link");
+  const sections = Array.from(document.querySelectorAll("section[id]"));
+  const navLinks = Array.from(document.querySelectorAll(".desktop-nav .nav-link"));
   if (!sections.length || !navLinks.length) return;
 
-  let ticking = false;
+  const setActiveLink = (id) => {
+    navLinks.forEach((link) => {
+      link.classList.toggle("active", link.getAttribute("href") === `#${id}`);
+    });
+  };
 
-  function onScroll() {
-    const scrollPos = window.scrollY + 120;
-
-    sections.forEach(sec => {
-      const top = sec.offsetTop;
-      const height = sec.offsetHeight;
-      const id = sec.getAttribute("id");
-
-      if (scrollPos >= top && scrollPos < top + height) {
-        navLinks.forEach(link => {
-          if (link.getAttribute("href") === `#${id}`) {
-            link.classList.add("active");
-          } else {
-            link.classList.remove("active");
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveLink(entry.target.getAttribute("id"));
           }
         });
+      },
+      {
+        rootMargin: "-25% 0px -60% 0px",
+        threshold: 0
       }
-    });
+    );
 
-    ticking = false;
+    sections.forEach((sec) => observer.observe(sec));
   }
 
+  let ticking = false;
   window.addEventListener("scroll", () => {
-    if (!ticking) {
-      window.requestAnimationFrame(onScroll);
-      ticking = true;
-    }
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      if (window.scrollY < 40) {
+        setActiveLink(sections[0].getAttribute("id"));
+      } else if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 4
+      ) {
+        setActiveLink(sections[sections.length - 1].getAttribute("id"));
+      }
+      ticking = false;
+    });
   }, { passive: true });
+
+  setActiveLink(sections[0].getAttribute("id"));
 }
 
-/* ================= 3. SCROLL SUAVE CON COMPENSACION DE CABECERA ================= */
+/* ================= 3. SCROLL SUAVE CON COMPENSACIÓN DE CABECERA ================= */
 function initSmoothLinks() {
   const anchorLinks = document.querySelectorAll('a[href^="#"]');
   const header = document.querySelector(".site-header");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  anchorLinks.forEach(link => {
+  anchorLinks.forEach((link) => {
     link.addEventListener("click", (e) => {
       const targetId = link.getAttribute("href");
       if (!targetId || targetId === "#") return;
@@ -101,17 +229,18 @@ function initSmoothLinks() {
 
       e.preventDefault();
       const headerHeight = header ? header.offsetHeight : 70;
-      const targetPosition = targetEl.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+      const targetPosition =
+        targetEl.getBoundingClientRect().top + window.pageYOffset - headerHeight;
 
       window.scrollTo({
         top: targetPosition,
-        behavior: "smooth"
+        behavior: reducedMotion ? "auto" : "smooth"
       });
     });
   });
 }
 
-/* ================= 4. MODALIDAD DE ATENCION Y PEDIDOS ================= */
+/* ================= 4. MODALIDAD DE ATENCIÓN Y PEDIDOS ================= */
 function initOrderStatusBar() {
   const textEl = document.getElementById("statusText");
   const noteEl = document.getElementById("statusHoursText");
@@ -124,7 +253,7 @@ function initOrderStatusBar() {
   }
 }
 
-/* ================= 5. NAVEGACION MOVIL ================= */
+/* ================= 5. NAVEGACIÓN MÓVIL ================= */
 function initMobileNav() {
   const toggleBtn = document.getElementById("mobileMenuBtn");
   const panel = document.getElementById("mobileNavPanel");
@@ -133,25 +262,52 @@ function initMobileNav() {
 
   const links = panel.querySelectorAll("a");
 
+  const closeMenu = (restoreFocus = false) => {
+    if (!panel.classList.contains("open")) return;
+    panel.classList.remove("open");
+    panel.setAttribute("aria-hidden", "true");
+    panel.setAttribute("hidden", "");
+    toggleBtn.setAttribute("aria-expanded", "false");
+    toggleBtn.setAttribute("aria-label", "Abrir menú de navegación");
+    document.body.style.overflow = "";
+    if (restoreFocus) toggleBtn.focus();
+  };
+
+  const openMenu = () => {
+    panel.removeAttribute("hidden");
+    panel.classList.add("open");
+    panel.setAttribute("aria-hidden", "false");
+    toggleBtn.setAttribute("aria-expanded", "true");
+    toggleBtn.setAttribute("aria-label", "Cerrar menú de navegación");
+    document.body.style.overflow = "hidden";
+    if (links[0]) {
+      requestAnimationFrame(() => links[0].focus());
+    }
+  };
+
   toggleBtn.addEventListener("click", () => {
-    const isOpen = panel.classList.toggle("open");
-    toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (panel.classList.contains("open")) {
+      closeMenu(false);
+    } else {
+      openMenu();
+    }
   });
 
-  links.forEach(link => {
-    link.addEventListener("click", () => {
-      panel.classList.remove("open");
-      toggleBtn.setAttribute("aria-expanded", "false");
-      document.body.style.overflow = "";
-    });
+  links.forEach((link) => {
+    link.addEventListener("click", () => closeMenu(false));
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && panel.classList.contains("open")) {
+      closeMenu(true);
+    }
   });
 }
 
 /* ================= 6. RENDERIZADO EDITORIAL DE PRODUCTOS ================= */
 function renderProducts() {
   const container = document.getElementById("productsContainer");
-  if (!container) return;
+  if (!container || typeof PRODUCTS === "undefined") return;
 
   const getWaUrl = (q) => `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(q)}`;
 
@@ -164,7 +320,7 @@ function renderProducts() {
           <div class="editorial-menu-box">
             <div class="editorial-menu-title">${product.fillingsTitle || "Variedades disponibles"}</div>
             <div class="editorial-fillings-list">
-              ${product.fillings.map(f => `
+              ${product.fillings.map((f) => `
                 <div class="editorial-filling-row">
                   <span class="filling-name">${f.name}:</span>
                   <span class="filling-detail">${f.detail}</span>
@@ -181,7 +337,8 @@ function renderProducts() {
           <div class="editorial-photo-frame tilt-target">
             <picture>
               <source srcset="${product.image.replace('.jpg', '.webp')}" type="image/webp">
-              <img src="${product.image}" alt="${product.imageAlt}" loading="lazy" width="560" height="420">
+              <img src="${product.image}" alt="${product.imageAlt}" loading="lazy" decoding="async"
+                width="${product.imageWidth || 896}" height="${product.imageHeight || 1200}">
             </picture>
           </div>
           <div class="editorial-photo-caption">
@@ -198,7 +355,7 @@ function renderProducts() {
           <div class="editorial-format-note">${product.format}</div>
 
           <div class="editorial-action-row">
-            <a href="${getWaUrl(product.whatsappQuery)}" target="_blank" rel="noopener" class="btn btn-primary">
+            <a href="${getWaUrl(product.whatsappQuery)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
               ${product.ctaLabel || "Consultar disponibilidad"}
             </a>
           </div>
@@ -210,49 +367,59 @@ function renderProducts() {
   container.innerHTML = html;
 }
 
-/* ================= 7. GALERIA CON LIGHTBOX ================= */
+/* ================= 7. GALERÍA CON LIGHTBOX ACCESIBLE ================= */
 function renderGallery() {
   const container = document.getElementById("galleryGrid");
-  if (!container) return;
+  if (!container || typeof GALLERY === "undefined") return;
 
-  let html = "";
-  GALLERY.forEach((item, index) => {
-    html += `
-      <figure class="gallery-item fade-in-up delay-${(index % 3) + 1}" data-index="${index}" tabindex="0" role="button" aria-label="Ampliar fotografía: ${item.title}">
-        <picture>
-          <source srcset="${item.image.replace('.jpg', '.webp')}" type="image/webp">
-          <img src="${item.image}" alt="${item.alt}" loading="lazy" width="400" height="300">
-        </picture>
-        <figcaption class="gallery-caption">
-          <span>${item.title}</span>
-          <span>${item.category}</span>
-        </figcaption>
-      </figure>
-    `;
-  });
+  const html = GALLERY.map((item, index) => `
+    <figure class="gallery-item fade-in-up delay-${(index % 3) + 1}" data-index="${index}" tabindex="0" role="button" aria-label="Ampliar fotografía: ${item.title}">
+      <picture>
+        <source srcset="${item.image.replace('.jpg', '.webp')}" type="image/webp">
+        <img src="${item.image}" alt="${item.alt}" loading="lazy" decoding="async"
+          width="${item.width || 1024}" height="${item.height || 1024}">
+      </picture>
+      <figcaption class="gallery-caption">
+        <span>${item.title}</span>
+        <span>${item.category}</span>
+      </figcaption>
+    </figure>
+  `).join("");
 
   container.innerHTML = html;
 }
 
 function initLightbox() {
   const modal = document.getElementById("lightboxModal");
+  const webpSource = document.getElementById("lightboxWebpSource");
   const modalImg = document.getElementById("lightboxImg");
   const modalCaption = document.getElementById("lightboxCaption");
   const closeBtn = document.getElementById("lightboxCloseBtn");
   const grid = document.getElementById("galleryGrid");
 
-  if (!modal || !grid) return;
+  if (!modal || !grid || !modalImg) return;
+
+  const controller = createModalController(modal, {
+    openClass: "open",
+    onAfterClose: () => {
+      modalImg.removeAttribute("src");
+      modalImg.alt = "";
+      if (webpSource) webpSource.setAttribute("srcset", "");
+    }
+  });
 
   const openLightboxItem = (item) => {
     const index = parseInt(item.getAttribute("data-index"), 10);
     const data = GALLERY[index];
     if (!data) return;
 
+    if (webpSource) {
+      webpSource.setAttribute("srcset", data.image.replace(".jpg", ".webp"));
+    }
     modalImg.src = data.image;
     modalImg.alt = data.alt;
     modalCaption.textContent = `${data.title} — ${data.category}`;
-    modal.classList.add("open");
-    document.body.style.overflow = "hidden";
+    controller.open(closeBtn);
   };
 
   grid.addEventListener("click", (e) => {
@@ -270,20 +437,9 @@ function initLightbox() {
     }
   });
 
-  const closeModal = () => {
-    modal.classList.remove("open");
-    document.body.style.overflow = "";
-  };
-
-  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (closeBtn) closeBtn.addEventListener("click", controller.close);
   modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("open")) {
-      closeModal();
-    }
+    if (e.target === modal) controller.close();
   });
 }
 
@@ -292,28 +448,24 @@ function renderDeliveryZones() {
   const container = document.getElementById("deliveryZonesContainer");
   if (!container || !CONFIG.deliveryZones) return;
 
-  let html = "";
-  CONFIG.deliveryZones.forEach(z => {
-    html += `
-      <div class="delivery-zone-row">
-        <span class="delivery-zone-name">${z.name}</span>
-        <span class="delivery-zone-note">${z.note}</span>
-      </div>
-    `;
-  });
+  const html = CONFIG.deliveryZones.map((z) => `
+    <div class="delivery-zone-row">
+      <span class="delivery-zone-name">${z.name}</span>
+      <span class="delivery-zone-note">${z.note}</span>
+    </div>
+  `).join("");
 
   container.innerHTML = html;
 }
 
-/* ================= 9. INCLINACION 3D SUTIL Y OPTIMIZADA ================= */
+/* ================= 9. INCLINACIÓN 3D SUTIL Y OPTIMIZADA ================= */
 function initSubtleTilt() {
-  // Desactivar si el usuario prefiere movimiento reducido o si es pantalla tactil
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   if (window.innerWidth < 1025) return;
 
   const targets = document.querySelectorAll(".tilt-target");
 
-  targets.forEach(el => {
+  targets.forEach((el) => {
     let frameId = null;
 
     el.addEventListener("mousemove", (e) => {
@@ -326,7 +478,6 @@ function initSubtleTilt() {
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
 
-        // Inclinacion maxima sutil y controlada: 4.5 grados
         const rotateX = ((y - centerY) / centerY) * -4.5;
         const rotateY = ((x - centerX) / centerX) * 4.5;
 
@@ -343,14 +494,18 @@ function initSubtleTilt() {
 
 /* ================= 10. ANIMACIONES AL SCROLL (INTERSECTION OBSERVER) ================= */
 function initScrollAnimations() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelectorAll(".fade-in-up").forEach(el => el.classList.add("is-visible"));
+  const elements = document.querySelectorAll(".fade-in-up");
+
+  if (
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    !("IntersectionObserver" in window)
+  ) {
+    elements.forEach((el) => el.classList.add("is-visible"));
     return;
   }
 
-  const elements = document.querySelectorAll(".fade-in-up");
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       if (entry.isIntersecting) {
         entry.target.classList.add("is-visible");
         observer.unobserve(entry.target);
@@ -361,7 +516,7 @@ function initScrollAnimations() {
     rootMargin: "0px 0px -40px 0px"
   });
 
-  elements.forEach(el => observer.observe(el));
+  elements.forEach((el) => observer.observe(el));
 }
 
 /* ================= 11. FORMULARIO DE CONTACTO ================= */
@@ -369,29 +524,76 @@ function initContactForm() {
   const form = document.getElementById("contactForm");
   if (!form) return;
 
+  const nameInput = document.getElementById("inputName");
+  const phoneInput = document.getElementById("inputPhone");
+  const productSelect = document.getElementById("selectProduct");
+  const notesInput = document.getElementById("inputNotes");
+  const errorBox = document.getElementById("formError");
+
+  const clearErrors = () => {
+    [nameInput, phoneInput].forEach((input) => {
+      if (input) {
+        input.removeAttribute("aria-invalid");
+        input.removeAttribute("aria-describedby");
+      }
+    });
+    if (errorBox) {
+      errorBox.textContent = "";
+      errorBox.hidden = true;
+    }
+  };
+
+  [nameInput, phoneInput].forEach((input) => {
+    if (input) {
+      input.addEventListener("input", () => {
+        if (input.getAttribute("aria-invalid") === "true") {
+          clearErrors();
+        }
+      });
+    }
+  });
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+    clearErrors();
 
-    const name = document.getElementById("inputName").value.trim();
-    const phone = document.getElementById("inputPhone").value.trim();
-    const product = document.getElementById("selectProduct").value;
-    const notes = document.getElementById("inputNotes").value.trim();
+    const name = nameInput ? nameInput.value.trim() : "";
+    const phone = phoneInput ? phoneInput.value.trim() : "";
+    const product = productSelect ? productSelect.value : "";
+    const notes = notesInput ? notesInput.value.trim() : "";
 
-    if (!name || !phone) {
-      alert("Por favor completa tu nombre y telefono de contacto.");
+    const missing = [];
+    if (!name && nameInput) {
+      nameInput.setAttribute("aria-invalid", "true");
+      nameInput.setAttribute("aria-describedby", "formError");
+      missing.push("nombre");
+    }
+    if (!phone && phoneInput) {
+      phoneInput.setAttribute("aria-invalid", "true");
+      phoneInput.setAttribute("aria-describedby", "formError");
+      missing.push("teléfono");
+    }
+
+    if (missing.length > 0) {
+      if (errorBox) {
+        errorBox.textContent = `Por favor completá tu ${missing.join(" y ")} de contacto para enviar la consulta.`;
+        errorBox.hidden = false;
+      }
+      const firstInvalid = !name ? nameInput : phoneInput;
+      if (firstInvalid) firstInvalid.focus();
       return;
     }
 
-    let message = `Hola Variedades Caseras, me comunico desde la pagina web.\n`;
+    let message = `Hola Variedades Caseras, me comunico desde la página web.\n`;
     message += `Nombre: ${name}\n`;
-    message += `Telefono: ${phone}\n`;
-    if (product) message += `Producto de interes: ${product}\n`;
+    message += `Teléfono: ${phone}\n`;
+    if (product) message += `Producto de interés: ${product}\n`;
     if (notes) message += `Consulta: ${notes}\n`;
-    message += `Queria consultar precio y disponibilidad.`;
+    message += `Quería consultar precio y disponibilidad.`;
 
     const encoded = encodeURIComponent(message);
     const url = `https://wa.me/${CONFIG.whatsappNumber}?text=${encoded}`;
-    window.open(url, "_blank");
+    window.open(url, "_blank", "noopener,noreferrer");
   });
 }
 
@@ -400,8 +602,7 @@ function initLegalModal() {
   const modal = document.getElementById("legalModal");
   const openBtns = [
     document.getElementById("footerLegalLink"),
-    document.getElementById("footerPrivacyLink"),
-    document.getElementById("cookieLegalBtn")
+    document.getElementById("footerPrivacyLink")
   ].filter(Boolean);
   const closeBtn = document.getElementById("legalCloseBtn");
   const confirmBtn = document.getElementById("legalConfirmBtn");
@@ -409,58 +610,15 @@ function initLegalModal() {
 
   if (!modal) return;
 
-  const openModal = (e) => {
-    if (e) e.preventDefault();
-    modal.classList.add("is-open");
-    document.body.style.overflow = "hidden";
-  };
+  const controller = createModalController(modal, { openClass: "is-open" });
 
-  const closeModal = () => {
-    modal.classList.remove("is-open");
-    document.body.style.overflow = "";
-  };
-
-  openBtns.forEach(btn => btn.addEventListener("click", openModal));
-  if (closeBtn) closeBtn.addEventListener("click", closeModal);
-  if (confirmBtn) confirmBtn.addEventListener("click", closeModal);
-  if (backdrop) backdrop.addEventListener("click", closeModal);
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("is-open")) {
-      closeModal();
-    }
-  });
+  openBtns.forEach((btn) =>
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      controller.open(closeBtn || confirmBtn);
+    })
+  );
+  if (closeBtn) closeBtn.addEventListener("click", controller.close);
+  if (confirmBtn) confirmBtn.addEventListener("click", controller.close);
+  if (backdrop) backdrop.addEventListener("click", controller.close);
 }
-
-/* ================= 14. BANNER DE COOKIES (COOKIS) ================= */
-function initCookieBanner() {
-  const banner = document.getElementById("cookieBanner");
-  const acceptBtn = document.getElementById("cookieAcceptBtn");
-  if (!banner || !acceptBtn) return;
-
-  try {
-    const hasConsent = localStorage.getItem("variedades_caseras_cookie_consent");
-    if (!hasConsent) {
-      setTimeout(() => {
-        banner.classList.add("is-visible");
-      }, 700);
-    }
-  } catch (e) {
-    banner.classList.add("is-visible");
-  }
-
-  acceptBtn.addEventListener("click", () => {
-    try {
-      localStorage.setItem("variedades_caseras_cookie_consent", "accepted");
-    } catch (e) {}
-    banner.classList.remove("is-visible");
-  });
-
-  const configBtn = document.getElementById("openCookieConfigBtn");
-  if (configBtn) {
-    configBtn.addEventListener("click", () => {
-      banner.classList.add("is-visible");
-    });
-  }
-}
-

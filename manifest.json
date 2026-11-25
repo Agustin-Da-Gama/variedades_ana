@@ -1,15 +1,15 @@
 {
   "name": "Variedades Caseras - Comida Casera Artesanal",
   "short_name": "Variedades Caseras",
-  "description": "Comida casera artesanal congelada en Leandro N. Alem, Misiones, Argentina. Empanaditas (Risoles) para freir, ñoquis, varenikes y milanesas de berenjena. Productos sellados con fecha de elaboracion y vencimiento.",
-  "start_url": "./index.html",
+  "description": "Comida casera artesanal congelada en Leandro N. Alem, Misiones, Argentina. Empanaditas (Risoles) para freír, ñoquis, varenikes y milanesas de berenjena. Productos sellados con fecha de elaboración y vencimiento.",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#F7F3EC",
   "theme_color": "#F7F3EC",
   "icons": [
     {
       "src": "assets/logo-oficial.png",
-      "sizes": "192x192 512x512",
+      "sizes": "840x840",
       "type": "image/png"
     }
   ]
